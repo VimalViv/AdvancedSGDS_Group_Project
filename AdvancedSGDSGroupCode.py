@@ -1,16 +1,20 @@
 import requests
 import pandas as pd
 import os
+import io
 
-API_KEY = "place_holder_key"  # Insert the actual API key here
-dataURL = "https://github.com/VimalViv/AdvancedSGDS_Group_Project/blob/main/placeholder_csv.csv"
+API_KEY = ""  # Insert the actual API key here
+dataURL = "https://raw.githubusercontent.com/VimalViv/AdvancedSGDS_Group_Project/main/placeholder_csv.csv"  # Replace with your actual raw GitHub URL
+
+# Fetch the CSV from GitHub using requests to avoid 429 rate limit errors
+headers = {"User-Agent": "Mozilla/5.0"}
+response = requests.get(dataURL, headers=headers)
+response.raise_for_status()
+df = pd.read_csv(io.StringIO(response.text), sep=',')
 
 # Create classification folders A, B, C if they don't already exist
 for folder in ["A", "B", "C"]:
     os.makedirs(folder, exist_ok=True)
-
-# Read the CSV file into a pandas DataFrame
-df = pd.read_csv(dataURL, sep=',')
 
 # Iterate through each row in the DataFrame
 for index, row in df.iterrows():
@@ -46,4 +50,4 @@ for index, row in df.iterrows():
     except requests.exceptions.RequestException as e:
         print(f"Failed to download image for {lat}, {lng}. Error: {e}")
 
-print("Done processing all coordinates.")
+print("Done processing all coordinates")
