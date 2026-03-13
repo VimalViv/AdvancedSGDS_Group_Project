@@ -2,7 +2,6 @@ import requests
 import pandas as pd
 import os
 import io
-import json
 
 API_KEY = "AIzaSyDN8yGSRutG_KOick-SQ2HIS7-tmphcKvM" # Reminder: Keep this secure!
 dataURL = "https://raw.githubusercontent.com/VimalViv/AdvancedSGDS_Group_Project/main/placeholder_csv.csv"
@@ -15,7 +14,6 @@ df = pd.read_csv(io.StringIO(response.text), sep=',')
 for folder in ["A", "B", "C"]:
     os.makedirs(folder, exist_ok=True)
 
-# Dictionary to collect image records per classification folder
 image_records = {"A": [], "B": [], "C": []}
 
 for index, row in df.iterrows():
@@ -27,27 +25,7 @@ for index, row in df.iterrows():
         print(f"Skipping row {index}: unknown classification '{classification}'")
         continue
 
-    # --- STEP 1: Check Metadata API ---
-    metadata_url = (
-        "https://maps.googleapis.com/maps/api/streetview/metadata"
-        f"?location={lat},{lng}&key={API_KEY}"
-    )
-
     try:
-        meta_r = requests.get(metadata_url, timeout=10)
-        meta_r.raise_for_status()
-        metadata = meta_r.json()
-
-        if metadata.get("status") != "OK":
-            print(f"No imagery found for {lat}, {lng}. Skipping...")
-            continue
-
-        actual_lat = metadata['location']['lat']
-        actual_lng = metadata['location']['lng']
-        pano_id = metadata['pano_id']
-        date = metadata.get('date', 'Unknown')
-
-        # --- STEP 2: Download the Image ---
         image_url = (
             "https://maps.googleapis.com/maps/api/streetview"
             f"?size=400x400&location={lat},{lng}"
@@ -59,29 +37,21 @@ for index, row in df.iterrows():
 
         base_filename = f"streetview_{index}"
         img_path = os.path.join(classification, f"{base_filename}.jpg")
-        meta_path = os.path.join(classification, f"{base_filename}_metadata.json")
 
-        # Save the image
         with open(img_path, "wb") as f:
             f.write(img_r.content)
 
-        # Save the metadata as a JSON file
-        with open(meta_path, "w") as f:
-            json.dump(metadata, f, indent=4)
-
-        # --- STEP 3: Record image + coordinates for CSV ---
         image_records[classification].append({
             "image 1": f"{base_filename}.jpg",
-            "lat": actual_lat,
-            "long": actual_lng
+            "lat": lat,
+            "long": lng
         })
 
-        print(f"Saved image and metadata for index {index} (Actual: {actual_lat}, {actual_lng})")
+        print(f"Saved image for index {index} ({lat}, {lng})")
 
     except requests.exceptions.RequestException as e:
         print(f"Error processing {lat}, {lng}: {e}")
 
-# --- STEP 4: Save a CSV per classification folder ---
 for folder, records in image_records.items():
     if records:
         csv_df = pd.DataFrame(records, columns=["image 1", "lat", "long"])
