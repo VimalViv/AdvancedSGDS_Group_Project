@@ -3,7 +3,7 @@ import pandas as pd
 import os
 import io
 
-API_KEY = "AIzaSyDN8yGSRutG_KOick-SQ2HIS7-tmphcKvM" # Reminder: Keep this secure!
+API_KEY = "placeholder_csv" 
 dataURL = "https://raw.githubusercontent.com/VimalViv/AdvancedSGDS_Group_Project/main/placeholder_csv.csv"
 
 headers = {"User-Agent": "Mozilla/5.0"}
