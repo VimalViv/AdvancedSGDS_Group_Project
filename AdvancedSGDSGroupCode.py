@@ -4,7 +4,7 @@ import os
 import io
 
 API_KEY = "placeholder_csv" 
-dataURL = "https://raw.githubusercontent.com/VimalViv/AdvancedSGDS_Group_Project/main/placeholder_csv.csv"
+dataURL = "https://raw.githubusercontent.com/VimalViv/AdvancedSGDS_Group_Project/main/placeholder.csv"
 
 headers = {"User-Agent": "Mozilla/5.0"}
 response = requests.get(dataURL, headers=headers)
