@@ -1,9 +1,13 @@
-import requests
-import pandas as pd
-import os
 import io
+import os
+from pathlib import Path
 
-API_KEY = "placeholder_csv" 
+import pandas as pd
+import requests
+
+from streetview_filter.utils import ensure_dir
+
+API_KEY = "placeholder_csv"
 dataURL = "https://raw.githubusercontent.com/VimalViv/AdvancedSGDS_Group_Project/main/placeholder.csv"
 
 headers = {"User-Agent": "Mozilla/5.0"}
@@ -12,7 +16,7 @@ response.raise_for_status()
 df = pd.read_csv(io.StringIO(response.text), sep=',')
 
 for folder in ["A", "B", "C"]:
-    os.makedirs(folder, exist_ok=True)
+    ensure_dir(Path(folder))
 
 image_records = {"A": [], "B": [], "C": []}
 
@@ -62,4 +66,3 @@ for folder, records in image_records.items():
         print(f"No images downloaded for folder '{folder}', skipping CSV.")
 
 print("Done processing all coordinates")
-
