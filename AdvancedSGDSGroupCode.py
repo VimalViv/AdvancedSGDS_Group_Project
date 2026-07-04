@@ -3,7 +3,14 @@ import pandas as pd
 import os
 import io
 
-API_KEY = "placeholder_csv" 
+API_KEY = os.environ.get("GOOGLE_MAPS_API_KEY")
+if not API_KEY:
+    raise SystemExit(
+        "Missing GOOGLE_MAPS_API_KEY environment variable. "
+        "Set it before running, e.g. `export GOOGLE_MAPS_API_KEY=your_key`. "
+        "Do not hardcode API keys in source."
+    )
+
 dataURL = "https://raw.githubusercontent.com/VimalViv/AdvancedSGDS_Group_Project/main/placeholder.csv"
 
 headers = {"User-Agent": "Mozilla/5.0"}
@@ -17,12 +24,21 @@ for folder in ["A", "B", "C"]:
 image_records = {"A": [], "B": [], "C": []}
 
 for index, row in df.iterrows():
-    lat = row['latitude']
-    lng = row['longitude']
     classification = str(row['classification']).strip().upper()
 
     if classification not in ["A", "B", "C"]:
         print(f"Skipping row {index}: unknown classification '{classification}'")
+        continue
+
+    try:
+        lat = float(row['latitude'])
+        lng = float(row['longitude'])
+    except (TypeError, ValueError):
+        print(f"Skipping row {index}: invalid coordinates '{row['latitude']}, {row['longitude']}'")
+        continue
+
+    if not (-90.0 <= lat <= 90.0 and -180.0 <= lng <= 180.0):
+        print(f"Skipping row {index}: coordinates out of range ({lat}, {lng})")
         continue
 
     try:

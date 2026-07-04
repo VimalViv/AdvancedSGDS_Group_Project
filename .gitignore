@@ -1,0 +1,14 @@
+# Secrets / environment
+.env
+.env.*
+*.key
+credentials.json
+
+# OS / editor cruft
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
